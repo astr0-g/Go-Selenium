@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	// "time"
+
 	"github.com/tebeka/selenium"
 	"github.com/tebeka/selenium/chrome"
 )
@@ -32,11 +34,13 @@ func main() {
             "--disable-translate",
             "--disable-popup-blocking",
             "--disable-infobars",
-            // "--disable-gpu",
+            "--disable-gpu",
             "--disable-blink-features=AutomationControlled",
             "--mute-audio",
             "--ignore-certificate-errors",
             "--allow-running-insecure-content",
+            "--window-size=300,600",
+            "--headless=new",
         },
         Extensions: []string{extensionBase64},
         Prefs: map[string]interface{}{
@@ -77,11 +81,22 @@ func main() {
     defer driver.Quit()
 
     // Navigate to a web page
-    if err := driver.Get("https://www.google.com"); err != nil {
+    if err := driver.Get("chrome-extension://jcacnejopjdphbnjgfaaobbfafkihpep/popup.html"); err != nil {
         fmt.Printf("Failed to load page: %s\n", err)
         os.Exit(1)
     }
 
-    
+
+    screenshot, err := driver.Screenshot()
+    if err != nil {
+        fmt.Printf("Failed to take screenshot: %s\n", err)
+        os.Exit(1)
+    }
+
+    // write the screenshot to a file
+    if err := ioutil.WriteFile("screenshot.png", screenshot, 0644); err != nil {
+        fmt.Printf("Failed to write screenshot to file: %s\n", err)
+        os.Exit(1)
+    }
     
 }
