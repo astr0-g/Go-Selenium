@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/selenium-Driver-Check/SeleniumDriverCheck"
 	"github.com/tebeka/selenium"
 	"github.com/tebeka/selenium/chrome"
 )
@@ -40,7 +41,7 @@ func main() {
             "--ignore-certificate-errors",
             "--allow-running-insecure-content",
             "--window-size=300,600",
-            "--headless=new",
+            // "--headless=new",
         },
         Extensions: []string{extensionBase64},
         Prefs: map[string]interface{}{
@@ -65,7 +66,8 @@ func main() {
 
 
     // Start a new ChromeDriver instance
-    wd, err := selenium.NewChromeDriverService("webdrivers/chromedriver.exe", 9515)
+    printLog := false
+    wd, err := selenium.NewChromeDriverService(SeleniumDriverCheck.AutoDownload_ChromeDriver(printLog), 9515)
     if err != nil {
         fmt.Printf("Failed to create ChromeDriver service: %s\n", err)
         os.Exit(1)
