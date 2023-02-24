@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-
-	// "time"
+	"time"
 
 	"github.com/tebeka/selenium"
 	"github.com/tebeka/selenium/chrome"
 )
 
 func main() {
+    fmt.Println(time.Now())
     // Initialize options
     // Read the extension file contents
     extensionData, err := ioutil.ReadFile("data/hivekeychain.crx")
@@ -81,10 +81,8 @@ func main() {
     defer driver.Quit()
 
     // Navigate to a web page
-    if err := driver.Get("chrome-extension://jcacnejopjdphbnjgfaaobbfafkihpep/popup.html"); err != nil {
-        fmt.Printf("Failed to load page: %s\n", err)
-        os.Exit(1)
-    }
+    login("","",driver,err)
+
 
 
     screenshot, err := driver.Screenshot()
@@ -99,4 +97,87 @@ func main() {
         os.Exit(1)
     }
     
+}
+func elementWaitAndClick(wd selenium.WebDriver, xpath string){
+    byXpath := selenium.ByXPATH
+    for {
+        element, err := wd.FindElement(byXpath, xpath)
+        if err != nil {
+            panic(err)
+        }
+        isEnabled, err := element.IsEnabled()
+        if err != nil {
+            panic(err)
+        }
+        if isEnabled {
+            err = element.Click()
+            if err != nil {
+                panic(err)
+            }
+            break
+        }
+        time.Sleep(1 * time.Second)
+    }
+}
+func login(userName string, postingKey string, wd selenium.WebDriver,err error) {
+	
+    err = wd.SetImplicitWaitTimeout(5 * time.Second)
+    if err != nil {
+        panic(err)
+    }
+    err = wd.Get("chrome-extension://jcacnejopjdphbnjgfaaobbfafkihpep/popup.html")
+    if err != nil {
+        panic(err)
+    }
+    
+    elementWaitAndClick(wd,"/html/body/div/div/div[4]/div[2]/div[5]/button")
+
+	el, _ := wd.FindElement(selenium.ByXPATH, "/html/body/div/div/div[1]/div/div[1]/div/input")
+	el.SendKeys("Aa123Aa123!!")
+	el, _ = wd.FindElement(selenium.ByXPATH, "/html/body/div/div/div[1]/div/div[2]/div/input")
+	el.SendKeys("Aa123Aa123!!")
+	el, _ = wd.FindElement(selenium.ByXPATH, "/html/body/div/div/div[1]/button/div")
+	el.Click()
+	el, _ = wd.FindElement(selenium.ByXPATH, "/html/body/div/div/div[1]/div[2]/div/div[2]/button[1]/div")
+	el.Click()
+	el, _ = wd.FindElement(selenium.ByXPATH, "/html/body/div/div/div[1]/div[2]/div/div[2]/div[1]/div/input")
+	el.SendKeys(userName)
+	el, _ = wd.FindElement(selenium.ByXPATH, "/html/body/div/div/div[1]/div[2]/div/div[2]/div[2]/div/input")
+	el.SendKeys(postingKey)
+	el, _ = wd.FindElement(selenium.ByXPATH, "/html/body/div/div/div[1]/div[2]/div/div[2]/div[2]/div/input")
+	time.Sleep(1*time.Second)
+    el.SendKeys("\ue007")
+    err = wd.ResizeWindow("bigger",1565,1080)
+    if err != nil{
+        println("can not change size")
+    }
+
+	
+	// wd.SetWindowSize(1565, 1080)
+	wd.Get("https://splinterforge.io/#/")
+    el, _ = wd.FindElement(selenium.ByXPATH, "/html/body/app/div[1]/div[1]/app-header/success-modal/section/div[1]/div[4]/div/button")
+    el.Click()
+    el, _ = wd.FindElement(selenium.ByXPATH, "/html/body/app/div[1]/div[1]/app-header/section/div[4]/div[2]/div/div/a/div[1]")
+    el.Click()
+    el, _ = wd.FindElement(selenium.ByXPATH, "/html/body/app/div[1]/login-modal/div/div/div/div[2]/div[2]/input")
+    el.SendKeys(userName)
+    el, _ = wd.FindElement(selenium.ByXPATH, "/html/body/app/div[1]/login-modal/div/div/div/div[2]/div[3]/button")
+    el.Click()
+    for {
+        handles, _ := wd.WindowHandles()
+        if len(handles) == 2 {
+            break
+        }
+    }
+    handles, _ := wd.WindowHandles()
+    wd.SwitchWindow(handles[1])
+    el, _ = wd.FindElement(selenium.ByXPATH, "/html/body/div/div/div/div[3]/div[1]/div/div")
+    el.Click()
+    el, _ = wd.FindElement(selenium.ByXPATH, "/html/body/div/div/div/div[3]/div[2]/button[2]/div")
+    el.Click()
+    wd.SwitchWindow(handles[0])
+    println("success log in")
+    fmt.Println(time.Now())
+    time.Sleep(5*time.Second)
+
 }
