@@ -183,6 +183,7 @@ func login(userName string, postingKey string, wd selenium.WebDriver,err error) 
     el.SendKeys(userName)
     el, _ = wd.FindElement(selenium.ByXPATH, "/html/body/app/div[1]/login-modal/div/div/div/div[2]/div[3]/button")
     el.Click()
+    time.Sleep(1*time.Second)
     for {
         handles, _ := wd.WindowHandles()
         if len(handles) == 2 {
@@ -370,7 +371,7 @@ func initializeDriver(accountData []map[string]interface{}){
     heroesType, _ := accountData[0]["heroesType"].(string)
     cardSelection, _ := accountData[0]["cardSelection"].([]map[string]interface{})
     login(userName,postingKey,driver,err)
-    // checkPopUp(driver)
+    checkPopUp(driver)
     battle(driver,userName,bossId,heroesType,cardSelection)
     screenshot, err := driver.Screenshot()
     if err != nil {
